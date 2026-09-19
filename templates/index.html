@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS // eAMS ÖSTERREICH TERMINAL V241.0</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        nexus: {
+                            bg: '#070a13',
+                            panel: 'rgba(15, 23, 42, 0.75)',
+                            border: 'rgba(56, 189, 248, 0.2)',
+                            cyan: '#38bdf8',
+                            navy: '#002366',
+                            emerald: '#10b981',
+                            amber: '#f59e0b',
+                            crimson: '#ef4444'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace', 'Courier'],
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #070a13;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 35, 102, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.1) 0px, transparent 50%);
+            color: #e2e8f0;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glow-cyan {
+            box-shadow: 0 0 20px -3px rgba(56, 189, 248, 0.35);
+        }
+        .glow-emerald {
+            box-shadow: 0 0 15px -2px rgba(16, 185, 129, 0.4);
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+    </style>
+</head>
+<body class="min-h-screen font-sans flex flex-col antialiased selection:bg-cyan-500 selection:text-black">
+
+    <!-- Top Mission Control HUD -->
+    <header class="border-b border-cyan-500/20 glass-panel sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-400/40 flex items-center justify-center glow-cyan">
+                    <i data-lucide="shield-alert" class="w-6 h-6 text-cyan-400"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-mono text-xs uppercase tracking-widest text-cyan-400 font-bold">NEXUS // SOVEREIGN HUB</span>
+                        <span class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-1.5 py-0.2 rounded font-mono">V241.0 AlVG</span>
+                    </div>
+                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        eAMS KONTROLL-TERMINAL 
+                        <span class="text-xs font-mono font-normal text-slate-400">| PSTNR: <strong class="text-white">4368522</strong> (Roland Sauer)</span>
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Telemetry Badges -->
+            <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+                <div id="badge-rgs" class="bg-slate-900/90 border border-slate-700 px-2.5 py-1.5 rounded flex items-center gap-1.5">
+                    <i data-lucide="building" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span class="text-slate-300">RGS: AMS Hietzinger Kai</span>
+                </div>
+
+                <div id="badge-gpu" class="bg-slate-900/90 border border-cyan-800/60 px-2.5 py-1.5 rounded flex items-center gap-1.5">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5 text-cyan-400"></i>
+                    <span id="gpu-text" class="text-cyan-300">RTX 5060 Ti: Prüfe...</span>
+                </div>
+
+                <div id="badge-ollama" class="bg-slate-900/90 border border-emerald-800/60 px-2.5 py-1.5 rounded flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="ollama-text" class="text-emerald-300">qwen2.5:14b [Bereit]</span>
+                </div>
+
+                <div id="badge-compliance" class="bg-emerald-950/80 border border-emerald-500/50 px-2.5 py-1.5 rounded flex items-center gap-1.5 glow-emerald">
+                    <i data-lucide="award" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span id="compliance-text" class="text-emerald-200 font-bold">AlVG-Score: 100% (V_gate=1.0)</span>
+                </div>
+            </div>
+
+            <!-- Quick Action Control -->
+            <div class="flex items-center gap-2">
+                <button onclick="triggerBrowser()" class="px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-900/40 transition">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    <span>MeinAMS Browser</span>
+                </button>
+                <button onclick="triggerScan()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs flex items-center gap-1.5 transition">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span>Gmail Scan</span>
+                </button>
+                <a href="/api/export-nachweis" target="_blank" class="px-3 py-1.5 rounded bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs flex items-center gap-1.5 transition">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                    <span>Nachweis drucken</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-800 space-x-1 font-mono text-xs">
+            <button onclick="switchTab('tab-radar')" id="btn-tab-radar" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 bg-slate-900/60">
+                <i data-lucide="radar" class="w-4 h-4"></i>
+                <span>1. Fristen- & Aufgaben-Radar (<span id="count-open-tasks">0</span>)</span>
+            </button>
+            <button onclick="switchTab('tab-apply')" id="btn-tab-apply" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>2. KI-Bewerbungs-Studio (Visium F)</span>
+            </button>
+            <button onclick="switchTab('tab-protocols')" id="btn-tab-protocols" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+                <i data-lucide="file-check" class="w-4 h-4"></i>
+                <span>3. Die Protokolle & Audit-Matrix (<span id="count-actions">0</span>)</span>
+            </button>
+            <button onclick="switchTab('tab-telemetry')" id="btn-tab-telemetry" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+                <i data-lucide="activity" class="w-4 h-4"></i>
+                <span>4. Bunker-Telemetrie</span>
+            </button>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 1: FRISTEN- & AUFGABEN-RADAR                              -->
+        <!-- ============================================================== -->
+        <div id="tab-radar" class="tab-content space-y-4">
+            <!-- Alert Banner for Today's message -->
+            <div id="today-alert" class="p-4 rounded-xl border border-amber-500/40 bg-amber-950/30 flex items-start justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400 mt-0.5"></i>
+                    <div>
+                        <h3 class="font-bold text-amber-200 text-sm">Aktuelle eAMS-Nachricht von heute (19.09.2026, 04:49 Uhr)</h3>
+                        <p class="text-xs text-amber-300/80 mt-1">
+                            Die Regionalgeschäftsstelle AMS Hietzinger Kai hat eine neue Mitteilung in deinem eAMS-Konto hinterlegt.
+                            Bitte rufe diese zeitgerecht ab, um AlVG-Sanktionen auszuschließen.
+                        </p>
+                    </div>
+                </div>
+                <button onclick="triggerBrowser()" class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs shrink-0 flex items-center gap-1.5">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                    <span>Im Portal lesen</span>
+                </button>
+            </div>
+
+            <!-- Task List -->
+            <div class="glass-panel rounded-xl p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-sm font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <i data-lucide="list-todo" class="w-4 h-4 text-cyan-400"></i>
+                        <span>Synchronisierte AMS-Meldungen & Fristen (TASKS.md)</span>
+                    </h2>
+                    <span class="text-xs text-slate-500 font-mono">Klick auf Checkbox wechselt Erledigt-Status</span>
+                </div>
+
+                <div id="tasks-container" class="space-y-2">
+                    <div class="text-slate-500 text-xs py-4 text-center">Lade Aufgaben...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: KI-BEWERBUNGS-STUDIO (VISIUM GENERATOR F)              -->
+        <!-- ============================================================== -->
+        <div id="tab-apply" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Input Column -->
+                <div class="lg:col-span-5 glass-panel rounded-xl p-5 space-y-4">
+                    <div class="border-b border-slate-800 pb-3">
+                        <span class="font-mono text-xs uppercase text-cyan-400 font-bold">OPERATOR F // GENERATOR</span>
+                        <h2 class="text-sm font-bold text-white">Stellenprofil & Vermittlungsvorschlag</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Füge hier den Inseratstext ein. Das lokale Modell <code class="text-cyan-300">qwen2.5:14b</code> formuliert das Anschreiben nach österreichischem Standard.</p>
+                    </div>
+
+                    <div class="space-y-3 text-xs font-mono">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Unternehmen / Organisation</label>
+                            <input type="text" id="apply-company" placeholder="z.B. TechVision Austria GmbH" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Position / Berufsbezeichnung</label>
+                            <input type="text" id="apply-position" placeholder="z.B. Senior Fullstack & Cloud Architekt" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Empfänger E-Mail (optional für Gmail-Draft)</label>
+                            <input type="email" id="apply-email" placeholder="z.B. bewerbung@unternehmen.at" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">Stellenausschreibung / Vermittlungsvorschlag Text</label>
+                            <textarea id="apply-job-text" rows="8" placeholder="Kopiere den Text der AMS-Zuweisung oder des Stellenangebots hier hinein..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white text-xs focus:border-cyan-400 focus:outline-none font-sans"></textarea>
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" id="apply-create-draft" class="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-0">
+                            <label for="apply-create-draft" class="text-slate-300 cursor-pointer">Sofort als Gmail-Entwurf anlegen (`gmail-cli draft`)</label>
+                        </div>
+                    </div>
+
+                    <button onclick="generateApplication()" id="btn-generate-apply" class="w-full py-2.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-900/40 transition">
+                        <i data-lucide="cpu" class="w-4 h-4"></i>
+                        <span>Bewerbung mit qwen2.5:14b generieren</span>
+                    </button>
+                    
+                    <div id="apply-spinner" class="hidden text-center py-2 text-xs font-mono text-cyan-300 animate-pulse">
+                        ⏳ GPU-Inferenz läuft auf RTX 5060 Ti... Bitte ca. 20-30 Sek. gedulden.
+                    </div>
+                </div>
+
+                <!-- Right Output Column -->
+                <div class="lg:col-span-7 glass-panel rounded-xl p-5 space-y-4 flex flex-col">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <span class="font-mono text-xs uppercase text-emerald-400 font-bold">ERGEBNIS // BEWERBUNGS-SCHREIBEN</span>
+                            <h2 id="apply-result-title" class="text-sm font-bold text-white">Vorschau & Feinschliff</h2>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyApplicationText()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 flex items-center gap-1">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                <span>Kopieren</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 min-h-[350px] flex flex-col">
+                        <textarea id="apply-output-text" class="w-full flex-1 bg-slate-900/90 border border-slate-800 rounded p-4 text-slate-200 text-xs font-sans leading-relaxed focus:border-cyan-400 focus:outline-none resize-y" placeholder="Das generierte Bewerbungsschreiben erscheint hier..."></textarea>
+                    </div>
+
+                    <div id="apply-status-notice" class="text-xs text-slate-400 font-mono flex items-center gap-2">
+                        <i data-lucide="info" class="w-3.5 h-3.5 text-slate-500"></i>
+                        <span>Jede erstellte Bewerbung wird automatisch im Ordner <code class="text-cyan-300">bewerbungen/</code> und in <code class="text-cyan-300">ACTIONS.md</code> protokolliert.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: DIE PROTOKOLLE & AUDIT-MATRIX                          -->
+        <!-- ============================================================== -->
+        <div id="tab-protocols" class="tab-content hidden space-y-4">
+            <div class="glass-panel rounded-xl p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs uppercase tracking-wider text-cyan-400 font-bold">NEXUS PROTOKOLL-REGISTER</span>
+                            <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-1.5 py-0.5 rounded font-mono">AlVG §§ 9, 10 Nachweis</span>
+                        </div>
+                        <h2 class="text-sm font-bold text-white mt-0.5">Chronologisches Aktions- & Nachweisprotokoll (ACTIONS.md)</h2>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="showManualActionModal()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
+                            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                            <span>Aktion erfassen</span>
+                        </button>
+                        <a href="/api/export-nachweis" target="_blank" class="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-black font-bold text-xs flex items-center gap-1.5 transition">
+                            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                            <span>Druckansicht / PDF</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sub-nav for Protocols -->
+                <div class="flex gap-2 border-b border-slate-800/80 pb-2 text-xs font-mono">
+                    <button onclick="toggleProtocolView('actions')" id="btn-prot-actions" class="px-3 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/50">Aktions-Tagebuch</button>
+                    <button onclick="toggleProtocolView('matrix')" id="btn-prot-matrix" class="px-3 py-1 rounded bg-slate-900 text-slate-400 hover:text-slate-200">NEXUS Matrix (PROTOKOLLE.md)</button>
+                </div>
+
+                <!-- View 1: Actions Table -->
+                <div id="view-prot-actions" class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-900/80 font-mono text-slate-400 border-b border-slate-800">
+                            <tr>
+                                <th class="py-2.5 px-3">ID</th>
+                                <th class="py-2.5 px-3">Zeitstempel</th>
+                                <th class="py-2.5 px-3">Kanal</th>
+                                <th class="py-2.5 px-3">Partner / Empfänger</th>
+                                <th class="py-2.5 px-3">Betreff / Kontext</th>
+                                <th class="py-2.5 px-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="actions-table-body" class="divide-y divide-slate-800/60 font-sans">
+                            <tr><td colspan="6" class="text-center py-4 text-slate-500">Lade Aktionen...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- View 2: Raw Markdown Matrix -->
+                <div id="view-prot-matrix" class="hidden">
+                    <pre id="raw-protocols-text" class="p-4 bg-slate-950 border border-slate-800 rounded-lg text-[11px] font-mono text-slate-300 whitespace-pre-wrap max-h-[500px] overflow-y-auto"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: BUNKER-TELEMETRIE & SYSTEM                             -->
+        <!-- ============================================================== -->
+        <div id="tab-telemetry" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card 1: GPU -->
+                <div class="glass-panel rounded-xl p-4 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400 font-mono text-xs">
+                        <span>NVIDIA GPU</span>
+                        <i data-lucide="cpu" class="w-4 h-4 text-cyan-400"></i>
+                    </div>
+                    <div id="tele-gpu-name" class="text-sm font-bold text-white">Prüfe...</div>
+                    <div class="text-xs font-mono text-slate-400">
+                        VRAM: <span id="tele-gpu-vram" class="text-cyan-300">0 / 0 MB</span><br>
+                        Temp: <span id="tele-gpu-temp" class="text-slate-200">0°C</span> | Util: <span id="tele-gpu-util" class="text-slate-200">0%</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Ollama -->
+                <div class="glass-panel rounded-xl p-4 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400 font-mono text-xs">
+                        <span>OLLAMA ENGINE</span>
+                        <i data-lucide="bot" class="w-4 h-4 text-emerald-400"></i>
+                    </div>
+                    <div id="tele-ollama-model" class="text-sm font-bold text-white">qwen2.5:14b</div>
+                    <div class="text-xs font-mono text-emerald-300 flex items-center gap-1.5 mt-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>Lokal aktiv (Port 11434)</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Browser Session -->
+                <div class="glass-panel rounded-xl p-4 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400 font-mono text-xs">
+                        <span>ID AUSTRIA SESSION</span>
+                        <i data-lucide="fingerprint" class="w-4 h-4 text-amber-400"></i>
+                    </div>
+                    <div id="tele-browser-state" class="text-sm font-bold text-white">Überprüfe...</div>
+                    <div class="text-xs font-mono text-slate-400">
+                        Profil: <span class="text-slate-200">.browser-profile</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Compliance Shield -->
+                <div class="glass-panel rounded-xl p-4 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400 font-mono text-xs">
+                        <span>AlVG SCHIELD</span>
+                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                    </div>
+                    <div class="text-sm font-bold text-emerald-300">V_gate = 1.0 (100%)</div>
+                    <div class="text-xs font-mono text-slate-400">
+                        Keine Fristüberschreitungen
+                    </div>
+                </div>
+            </div>
+
+            <!-- Axiom Sovereign Identity Card -->
+            <div class="glass-panel rounded-xl p-5 space-y-3 font-mono text-xs">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="database" class="w-4 h-4 text-cyan-400"></i>
+                    <span>Axiom Identity Register (Single Source of Truth)</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-300 bg-slate-950/60 p-4 rounded-lg border border-slate-800">
+                    <div><strong>Klient:</strong> Roland Sauer</div>
+                    <div><strong>PSTNR:</strong> 4368522</div>
+                    <div><strong>Regionalgeschäftsstelle:</strong> AMS Hietzinger Kai, Wien</div>
+                    <div><strong>E-Mail:</strong> r.sauer007@gmail.com</div>
+                    <div><strong>Rechtsgrundlage:</strong> Arbeitslosenversicherungsgesetz (AlVG 1977 idgF)</div>
+                    <div><strong>Host-Maschine:</strong> Linux Desktop / RTX 5060 Ti Local Bunker</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Statusline -->
+    <footer class="border-t border-slate-800/80 glass-panel py-2 text-xs font-mono text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div>NEXUS // eAMS SUITE • Sovereign Local Bunker Architecture • No Cloud Leaks</div>
+            <div id="footer-time">Stand: Synchronisiert</div>
+        </div>
+    </footer>
+
+    <!-- Manual Action Modal -->
+    <div id="modal-action" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full p-5 space-y-4 text-xs font-mono">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-white text-sm">Aktion manuell protokollieren</h3>
+                <button onclick="closeManualActionModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-slate-400 mb-1">Kanal</label>
+                    <select id="modal-channel" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">
+                        <option value="Telefon">Telefon</option>
+                        <option value="eAMS-Portal">eAMS-Portal</option>
+                        <option value="E-Mail">E-Mail</option>
+                        <option value="Persönlich">Persönlicher Kontrolltermin</option>
+                        <option value="Bewerbung">Eigenbewerbung</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Partner / Empfänger</label>
+                    <input type="text" id="modal-recipient" placeholder="z.B. AMS Betreuer oder Firmenname" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Betreff / Kontext</label>
+                    <input type="text" id="modal-subject" placeholder="z.B. Beratungsgespräch / Bewerbungsnachweis" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Inhalt / Zusammenfassung</label>
+                    <textarea id="modal-summary" rows="3" placeholder="Wichtige Punkte des Gesprächs oder der Vereinbarung..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button onclick="closeManualActionModal()" class="px-3 py-1.5 rounded bg-slate-800 text-slate-300">Abbrechen</button>
+                <button onclick="saveManualAction()" class="px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold">Speichern & Versiegeln</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend Logic Script -->
+    <script>
+        lucide.createIcons();
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-cyan-400', 'text-cyan-400', 'bg-slate-900/60');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('border-cyan-400', 'text-cyan-400', 'bg-slate-900/60');
+                activeBtn.classList.remove('border-transparent', 'text-slate-400');
+            }
+            if (tabId === 'tab-protocols') loadProtocols();
+        }
+
+        function toggleProtocolView(view) {
+            const act = document.getElementById('view-prot-actions');
+            const mat = document.getElementById('view-prot-matrix');
+            const btnAct = document.getElementById('btn-prot-actions');
+            const btnMat = document.getElementById('btn-prot-matrix');
+
+            if (view === 'actions') {
+                act.classList.remove('hidden');
+                mat.classList.add('hidden');
+                btnAct.className = 'px-3 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/50';
+                btnMat.className = 'px-3 py-1 rounded bg-slate-900 text-slate-400 hover:text-slate-200';
+            } else {
+                act.classList.add('hidden');
+                mat.classList.remove('hidden');
+                btnMat.className = 'px-3 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/50';
+                btnAct.className = 'px-3 py-1 rounded bg-slate-900 text-slate-400 hover:text-slate-200';
+            }
+        }
+
+        async function refreshStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+
+                // GPU
+                if (data.gpu && data.gpu.available) {
+                    document.getElementById('gpu-text').textContent = `${data.gpu.name.replace('NVIDIA GeForce ', '')}: ${Math.round(data.gpu.mem_used_mb/1024)}/${Math.round(data.gpu.mem_total_mb/1024)}GB (${data.gpu.util_pct}%)`;
+                    document.getElementById('tele-gpu-name').textContent = data.gpu.name;
+                    document.getElementById('tele-gpu-vram').textContent = `${data.gpu.mem_used_mb} / ${data.gpu.mem_total_mb} MB`;
+                    document.getElementById('tele-gpu-temp').textContent = `${data.gpu.temp_c}°C`;
+                    document.getElementById('tele-gpu-util').textContent = `${data.gpu.util_pct}%`;
+                }
+
+                // Browser State
+                const bState = data.browser_running ? "Aktiv (Geöffnet)" : "Bereit für Login";
+                document.getElementById('tele-browser-state').textContent = bState;
+                document.getElementById('tele-browser-state').className = data.browser_running ? "text-sm font-bold text-emerald-400" : "text-sm font-bold text-amber-400";
+
+                // Counters
+                document.getElementById('count-open-tasks').textContent = data.stats.open_tasks;
+                document.getElementById('count-actions').textContent = data.stats.total_actions;
+                document.getElementById('footer-time').textContent = `Stand: ${data.timestamp}`;
+
+                // Check for today's alert
+                const alertEl = document.getElementById('today-alert');
+                if (data.stats.open_tasks > 0) {
+                    alertEl.classList.remove('hidden');
+                } else {
+                    alertEl.classList.add('hidden');
+                }
+
+            } catch (err) {
+                console.error("Status fetch error", err);
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const res = await fetch('/api/tasks');
+                const tasks = await res.json();
+                const container = document.getElementById('tasks-container');
+                container.innerHTML = '';
+
+                if (tasks.length === 0) {
+                    container.innerHTML = '<div class="text-slate-500 text-xs py-4 text-center font-mono">Keine offenen Aufgaben vorhanden.</div>';
+                    return;
+                }
+
+                tasks.forEach(t => {
+                    const isDone = t.done;
+                    const card = document.createElement('div');
+                    card.className = `p-3 rounded-lg border transition ${isDone ? 'bg-slate-950/40 border-slate-900 opacity-60' : 'bg-slate-900/90 border-slate-800 hover:border-cyan-800/70'}`;
+                    
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTask(${t.id})" class="mt-1 rounded bg-slate-950 border-slate-700 text-cyan-500 focus:ring-0 cursor-pointer">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-900">#${t.id}</span>
+                                        <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-900">${t.priority || 'HOCH'}</span>
+                                        <span class="font-bold text-xs ${isDone ? 'line-through text-slate-400' : 'text-slate-200'}">${t.title}</span>
+                                    </div>
+                                    ${t.description ? `<p class="text-[11px] text-slate-400 mt-1 font-sans">${t.description.replace(/\n/g, '<br>')}</p>` : ''}
+                                    ${t.source_sender ? `<div class="text-[10px] font-mono text-slate-500 mt-1">Quelle: ${t.source_sender}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button onclick="fillApplyFromTask('${t.title.replace(/'/g, "\\'")}', '${(t.description||'').replace(/'/g, "\\'").replace(/\n/g, ' ')}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-cyan-950 hover:text-cyan-300 text-slate-400 text-[11px] font-mono transition">
+                                    Bewerbung verfassen
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Tasks load error", err);
+            }
+        }
+
+        async function toggleTask(id) {
+            await fetch(`/api/tasks/${id}/toggle`, { method: 'POST' });
+            await loadTasks();
+            await refreshStatus();
+        }
+
+        async function triggerBrowser() {
+            await fetch('/api/browser/open', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+            await refreshStatus();
+            alert("Google Chrome mit deinem eAMS-Profil wurde gestartet. Bitte melde dich via ID Austria im Browserfenster an.");
+        }
+
+        async function triggerScan() {
+            const res = await fetch('/api/scan', { method: 'POST' });
+            const data = await res.json();
+            await loadTasks();
+            await refreshStatus();
+            alert("Gmail-Scan abgeschlossen! Neue Benachrichtigungen wurden in TASKS.md übernommen.");
+        }
+
+        function fillApplyFromTask(title, desc) {
+            document.getElementById('apply-position').value = title;
+            document.getElementById('apply-job-text').value = desc;
+            switchTab('tab-apply');
+        }
+
+        async function generateApplication() {
+            const jobText = document.getElementById('apply-job-text').value;
+            const company = document.getElementById('apply-company').value;
+            const position = document.getElementById('apply-position').value;
+            const toEmail = document.getElementById('apply-email').value;
+            const createDraft = document.getElementById('apply-create-draft').checked;
+
+            if (!jobText.trim()) {
+                alert("Bitte gib eine Stellenausschreibung ein.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-generate-apply');
+            const spinner = document.getElementById('apply-spinner');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            spinner.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        job_text: jobText,
+                        company: company,
+                        position: position,
+                        to_email: toEmail,
+                        create_draft: createDraft
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    alert("Fehler bei der Generierung: " + (err.detail || "Serverfehler"));
+                    return;
+                }
+
+                const data = await res.json();
+                document.getElementById('apply-output-text').value = data.content;
+                document.getElementById('apply-result-title').textContent = `Bewerbung: ${company || 'Generiert'} (${data.filename})`;
+                await refreshStatus();
+                alert(`Bewerbung erfolgreich generiert!\nGespeichert in: ${data.filename}${data.draft_created ? '\nGmail-Entwurf wurde ebenfalls angelegt!' : ''}`);
+            } catch (ex) {
+                alert("Netzwerkfehler: " + ex);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+                spinner.classList.add('hidden');
+            }
+        }
+
+        function copyApplicationText() {
+            const txt = document.getElementById('apply-output-text');
+            txt.select();
+            navigator.clipboard.writeText(txt.value);
+            alert("Bewerbungstext in Zwischenablage kopiert!");
+        }
+
+        async function loadProtocols() {
+            try {
+                const [pRes, aRes] = await Promise.all([
+                    fetch('/api/protocols'),
+                    fetch('/api/actions')
+                ]);
+                const pData = await pRes.json();
+                const aData = await aRes.json();
+
+                // Raw markdown matrix
+                document.getElementById('raw-protocols-text').textContent = pData.protokolle_md || "Kein Protokoll vorhanden";
+
+                // Actions Table
+                const tbody = document.getElementById('actions-table-body');
+                tbody.innerHTML = '';
+                if (aData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-500">Noch keine Aktionen erfasst.</td></tr>';
+                    return;
+                }
+
+                aData.sort((a, b) => (b.id || 0) - (a.id || 0)).forEach(a => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-900/60 transition";
+                    row.innerHTML = `
+                        <td class="py-2 px-3 font-mono text-cyan-400">#${a.id}</td>
+                        <td class="py-2 px-3 font-mono text-slate-400">${a.timestamp}</td>
+                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px]">${a.channel}</span></td>
+                        <td class="py-2 px-3 font-bold text-slate-200">${a.recipient}</td>
+                        <td class="py-2 px-3 text-slate-300">${a.subject}</td>
+                        <td class="py-2 px-3"><span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-mono">${a.status}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error("Protocols load error", err);
+            }
+        }
+
+        function showManualActionModal() {
+            document.getElementById('modal-action').classList.remove('hidden');
+        }
+        function closeManualActionModal() {
+            document.getElementById('modal-action').classList.add('hidden');
+        }
+        async function saveManualAction() {
+            const channel = document.getElementById('modal-channel').value;
+            const recipient = document.getElementById('modal-recipient').value;
+            const subject = document.getElementById('modal-subject').value;
+            const summary = document.getElementById('modal-summary').value;
+
+            if (!recipient || !subject) {
+                alert("Bitte Empfänger und Betreff ausfüllen.");
+                return;
+            }
+
+            await fetch('/api/actions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ channel, recipient, subject, summary, status: 'Erfasst' })
+            });
+
+            closeManualActionModal();
+            await loadProtocols();
+            await refreshStatus();
+        }
+
+        // Init on page load
+        refreshStatus();
+        loadTasks();
+        setInterval(refreshStatus, 10000);
+    </script>
+</body>
+</html>

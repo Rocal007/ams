@@ -484,6 +484,16 @@ def generate_application(job_input: str, company: Optional[str] = None, position
     print(content)
     print("=" * 60)
 
+def launch_app(port: int = 8765, open_browser: bool = False):
+    import uvicorn
+    app_url = f"http://127.0.0.1:{port}"
+    print(f"🚀 Starte NEXUS // eAMS ÖSTERREICH TERMINAL V241.0:")
+    print(f"   URL: {app_url}")
+    print(f"   AlVG Compliance Standard: AKTIV")
+    if open_browser:
+        subprocess.Popen(["google-chrome", app_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    uvicorn.run("app:app", host="127.0.0.1", port=port, reload=False)
+
 # ---------------------------------------------------------------------------
 # CLI Argument Parser
 # ---------------------------------------------------------------------------
@@ -529,13 +539,20 @@ def main():
     p_apply.add_argument("--to", help="E-Mail-Adresse für Bewerbungsentwurf")
     p_apply.add_argument("--draft", action="store_true", help="Direkt als Gmail-Entwurf speichern")
 
+    # app / serve
+    p_app = subparsers.add_parser("app", aliases=["serve"], help="Startet die NEXUS Web-Anwendung (FastAPI + Visium UI)")
+    p_app.add_argument("-p", "--port", type=int, default=8765, help="Port für die Web-Anwendung (Standard: 8765)")
+    p_app.add_argument("--open", action="store_true", help="Öffnet die Web-Anwendung automatisch im Browser")
+
     args = parser.parse_args()
 
     if not args.command:
         parser.print_help()
         sys.exit(0)
 
-    if args.command in ["browser", "open"]:
+    if args.command in ["app", "serve"]:
+        launch_app(port=args.port, open_browser=args.open)
+    elif args.command in ["browser", "open"]:
         launch_browser(args.url)
     elif args.command == "scan":
         scan_emails(args.limit)

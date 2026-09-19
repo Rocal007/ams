@@ -25,6 +25,14 @@ Zentrale Automatisierungs-, Dokumenten- und Kommunikations-Suite für das persö
    * [TASKS.md](TASKS.md): Fristen, Termine und offene eAMS-Nachrichten.
    * [ACTIONS.md](ACTIONS.md): Lückenloses AMS-Bewerbungstagebuch für Kontroll- und Nachweispflichten.
 
+5. **NEXUS Protokoll-Matrix ([PROTOKOLLE.md](PROTOKOLLE.md))**
+   * Vollständiges Audit-Register nach dem Operator-Modell $\mathcal{T}_{\text{AMS}} = C \circ P_J \circ D_L \circ F$.
+   * AlVG §§ 9, 10 Fristenwächter und Druck-Export für das AMS.
+
+6. **Web-Anwendung (NEXUS Visium Dashboard)**
+   * Vollwertige Web-UI mit Live-Telemetrie (RTX 5060 Ti GPU, Ollama, Chrome-Session).
+   * Erreichbar unter `http://127.0.0.1:8765`.
+
 ---
 
 ## Verzeichnisstruktur
@@ -36,9 +44,13 @@ ams/
 ├── vermittlungsvorschlaege/ # Stellenangebote & Zuweisungen vom AMS
 ├── bewerbungen/             # Generierte Bewerbungsschreiben & Lebensläufe
 ├── bescheide/               # Leistungsbescheide & Vereinbarungen
+├── templates/index.html     # NEXUS Visium Web-Dashboard
+├── app.py                   # FastAPI Server & REST-API
+├── run_app.sh               # Schnellstarter für die Web-Anwendung
 ├── ams_agent.py             # Zentrales CLI-Tool & Automatisierungsskript
 ├── TASKS.md                 # Aufgaben- & Fristen-Board
 ├── ACTIONS.md               # Chronologisches Bewerbungs- & Aktivitätenprotokoll
+├── PROTOKOLLE.md            # NEXUS Protokoll- & Audit-Matrix (AlVG-Standard)
 └── README.md                # Dokumentation
 ```
 
@@ -47,21 +59,28 @@ ams/
 ## Befehlsübersicht (`ams-agent`)
 
 ```bash
-# 1. MeinAMS Browser mit ID Austria Session öffnen
+# 1. NEXUS Web-Anwendung starten (http://127.0.0.1:8765)
+ams-agent app
+# oder direkt mit Browser:
+ams-agent app --open
+# oder via Shell-Starter:
+./run_app.sh
+
+# 2. MeinAMS Browser mit ID Austria Session öffnen
 ams-agent browser
 
-# 2. Gmail nach neuen AMS-Nachrichten scannen & TASKS.md aktualisieren
+# 3. Gmail nach neuen AMS-Nachrichten scannen & TASKS.md aktualisieren
 ams-agent scan
 
-# 3. Bewerbung auf einen Vermittlungsvorschlag generieren
+# 4. Bewerbung auf einen Vermittlungsvorschlag generieren
 ams-agent apply "vermittlungsvorschlaege/stelle_123.txt"
 # Optional direkt als Gmail-Entwurf speichern:
 ams-agent apply "vermittlungsvorschlaege/stelle_123.txt" --draft
 
-# 4. Aufgaben anzeigen / als erledigt markieren
+# 5. Aufgaben anzeigen / als erledigt markieren
 ams-agent tasks
 ams-agent done 1
 
-# 5. Bewerbungstagebuch / Nachweise anzeigen
+# 6. Bewerbungstagebuch / Nachweise anzeigen
 ams-agent actions
 ```
