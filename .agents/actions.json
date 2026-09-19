@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2026-09-19 13:25:10",
+    "channel": "System / Git",
+    "recipient": "AMS Hietzinger Kai (PSTNR: 4368522)",
+    "subject": "AMS Automatisierungs-Suite eingerichtet",
+    "summary": "Repository geklont, ams-agent CLI bereitgestellt, Browser-Profil für ID Austria konfiguriert und Gmail-Scan initialisiert.",
+    "status": "Initialisiert",
+    "task_id": null,
+    "message_id": null
+  }
+]

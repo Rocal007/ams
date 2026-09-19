@@ -1,0 +1,16 @@
+# Chrome Browser Profile (enthält sensible Sessions/Cookies)
+.browser-profile/
+.chrome-profile/
+
+# Python Cache & venv
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+
+# Temporäre Daten & Logs
+*.log
+*.tmp
+.DS_Store
