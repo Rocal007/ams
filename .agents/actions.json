@@ -31,5 +31,16 @@
     "status": "Sitzung gestartet",
     "task_id": null,
     "message_id": null
+  },
+  {
+    "id": 4,
+    "timestamp": "2026-09-20 18:57:07",
+    "channel": "eAMS-Portal",
+    "recipient": "AMS Hietzinger Kai (PSTNR: 4368522)",
+    "subject": "Live-Dashboard synchronisiert & analysiert",
+    "summary": "Erfolgreicher Login via ID Austria. Live-Befunde: 1 offene Rückmeldung (18.09.), Orientierungsveranstaltung 'Fit für den Arbeitsmarkt' (24.09.2026), rotes Warnbadge bei Bewerbungen ('Kontakt mit AMS erforderlich') und SÖB TOP-Lokal Schreiben (09.09.).",
+    "status": "Geprüft",
+    "task_id": null,
+    "message_id": null
   }
 ]

@@ -1,12 +1,18 @@
 # AMS Aktions- & Bewerbungsprotokoll (ACTIONS.md)
 
-> Zuletzt synchronisiert: 20.09.2026 18:51:20
+> Zuletzt synchronisiert: 20.09.2026 18:57:07
 
 Lückenloses Nachweisprotokoll aller externen Konversationen, Bewerbungen, eAMS-Eingaben und behördlichen Kontakte (gemäß Vorgabe `RULE[user_global]`). Dient als offizieller AMS-Aktivitäts- und Bewerbungsnachweis.
 
 ---
 
 ## Chronologische Übersicht der Aktionen
+
+### [#4] 2026-09-20 18:57:07 | eAMS-Portal | Geprüft
+- **Partner / Organisation:** AMS Hietzinger Kai (PSTNR: 4368522)
+- **Betreff / Kontext:** Live-Dashboard synchronisiert & analysiert
+- **Inhalt / Auszug:**
+  > Erfolgreicher Login via ID Austria. Live-Befunde: 1 offene Rückmeldung (18.09.), Orientierungsveranstaltung 'Fit für den Arbeitsmarkt' (24.09.2026), rotes Warnbadge bei Bewerbungen ('Kontakt mit AMS erforderlich') und SÖB TOP-Lokal Schreiben (09.09.).
 
 ### [#3] 2026-09-20 18:51:20 | Browser / ID Austria | Sitzung gestartet
 - **Partner / Organisation:** AMS Hietzinger Kai (PSTNR: 4368522)
