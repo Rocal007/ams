@@ -20,5 +20,16 @@
     "status": "Sitzung gestartet",
     "task_id": null,
     "message_id": null
+  },
+  {
+    "id": 3,
+    "timestamp": "2026-09-20 18:51:20",
+    "channel": "Browser / ID Austria",
+    "recipient": "AMS Hietzinger Kai (PSTNR: 4368522)",
+    "subject": "MeinAMS Portal geöffnet",
+    "summary": "Chrome gestartet mit Ziel-URL: https://login.ams.at/realms/MeinAMS/protocol/openid-connect/auth?response_type=code&client_id=meinams&state=U1AwWXZCczFseUJXNH5ONWhWWXY1VGxIZnB6UkxPZGgyUHk1TE9DcDRoN1FT%3B%257B%257D&redirect_uri=https%3A%2F%2Fwww.ams.at%2Flogin%2Fprocess&scope=openid%20profile%20email%20ams&code_challenge=VqWol5kwx6A1O0VD71Hnk2a8tDhGp6DvKkkBgc1T_Og&code_challenge_method=S256&nonce=U1AwWXZCczFseUJXNH5ONWhWWXY1VGxIZnB6UkxPZGgyUHk1TE9DcDRoN1FT&login_hint=&prompt=login",
+    "status": "Sitzung gestartet",
+    "task_id": null,
+    "message_id": null
   }
 ]
