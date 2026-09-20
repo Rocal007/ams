@@ -1,6 +1,7 @@
 # Chrome Browser Profile (enthält sensible Sessions/Cookies)
 .browser-profile/
 .chrome-profile/
+.app-profile/
 
 # Python Cache & venv
 __pycache__/

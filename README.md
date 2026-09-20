@@ -47,6 +47,13 @@ ams/
 ├── templates/index.html     # NEXUS Visium Web-Dashboard
 ├── app.py                   # FastAPI Server & REST-API
 ├── run_app.sh               # Schnellstarter für die Web-Anwendung
+├── nexus-ams-launcher.sh   # Intelligenter Desktop- & Window-Launcher (App Mode)
+├── nexus-ams.desktop       # Linux Desktop-Verknüpfung (GNOME / Schreibtisch)
+├── static/
+│   ├── icon.png            # NEXUS App Icon (256x256)
+│   ├── icon.svg            # Skalierbares Vektor-Icon
+│   ├── manifest.json       # PWA Web App Manifest (Standalone Mode)
+│   └── sw.js               # PWA Service Worker (Offline Cache & Schnellstart)
 ├── ams_agent.py             # Zentrales CLI-Tool & Automatisierungsskript
 ├── TASKS.md                 # Aufgaben- & Fristen-Board
 ├── ACTIONS.md               # Chronologisches Bewerbungs- & Aktivitätenprotokoll
@@ -56,15 +63,24 @@ ams/
 
 ---
 
+## Standalone App & Desktop-Start
+
+Die Anwendung ist als eigenständige Desktop- und Progressive-Web-App (PWA) integriert:
+
+* **GNOME-Anwendungsmenü:** Einfach nach **"eAMS"** oder **"NEXUS"** suchen und starten.
+* **Desktop-Icon:** Doppelklick auf `NEXUS-eAMS.desktop` auf dem Schreibtisch.
+* **Terminal-Befehl:** `nexus-ams` oder `ams-app` (über `~/.local/bin`).
+* **Shell-Starter:** `./nexus-ams-launcher.sh` bzw. `./run_app.sh`
+
+---
+
 ## Befehlsübersicht (`ams-agent`)
 
 ```bash
-# 1. NEXUS Web-Anwendung starten (http://127.0.0.1:8765)
-ams-agent app
-# oder direkt mit Browser:
+# 1. Standalone-App öffnen (rahmenloses Fenster + automatischer Serverstart)
+nexus-ams
+# oder via CLI:
 ams-agent app --open
-# oder via Shell-Starter:
-./run_app.sh
 
 # 2. MeinAMS Browser mit ID Austria Session öffnen
 ams-agent browser

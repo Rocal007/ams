@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -29,6 +29,7 @@ os.makedirs(TEMPLATES_DIR, exist_ok=True)
 os.makedirs(STATIC_DIR, exist_ok=True)
 
 app = FastAPI(title="NEXUS // AMS Application", version="241.0")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # ---------------------------------------------------------------------------
 # Telemetry Helpers
@@ -265,6 +266,164 @@ def trigger_apply(req: ApplyRequest):
         "content": content,
         "draft_created": draft_status,
         "action": action
+    }
+
+# ---------------------------------------------------------------------------
+# PWA & Web App Manifest Endpoints
+# ---------------------------------------------------------------------------
+
+@app.get("/manifest.json")
+def get_manifest():
+    manifest_path = os.path.join(STATIC_DIR, "manifest.json")
+    if os.path.exists(manifest_path):
+        return FileResponse(manifest_path, media_type="application/manifest+json")
+    raise HTTPException(status_code=404, detail="Manifest not found")
+
+@app.get("/sw.js")
+def get_service_worker():
+    sw_path = os.path.join(STATIC_DIR, "sw.js")
+    if os.path.exists(sw_path):
+        return FileResponse(sw_path, media_type="application/javascript")
+    raise HTTPException(status_code=404, detail="Service worker not found")
+
+@app.get("/favicon.ico")
+def get_favicon():
+    icon_path = os.path.join(STATIC_DIR, "icon.png")
+    if os.path.exists(icon_path):
+        return FileResponse(icon_path, media_type="image/png")
+    raise HTTPException(status_code=404, detail="Icon not found")
+
+# ---------------------------------------------------------------------------
+# Document Vault Endpoints
+# ---------------------------------------------------------------------------
+
+DOC_CATEGORIES = {
+    "vermittlungsvorschlaege": {
+        "dir": ams_agent.VERMITTLUNGEN_DIR,
+        "label": "Vermittlungsvorschläge"
+    },
+    "bewerbungen": {
+        "dir": ams_agent.BEWERBUNGEN_DIR,
+        "label": "Bewerbungsschreiben"
+    },
+    "bescheide": {
+        "dir": os.path.join(PROJECT_ROOT, "bescheide"),
+        "label": "Bescheide & Nachweise"
+    },
+    "postfach": {
+        "dir": ams_agent.POSTFACH_DIR,
+        "label": "eAMS Postfach Dokumente"
+    }
+}
+
+@app.get("/api/documents/list")
+def list_documents():
+    docs = []
+    for cat_key, cat_info in DOC_CATEGORIES.items():
+        folder = cat_info["dir"]
+        if not os.path.exists(folder):
+            continue
+        for entry in os.scandir(folder):
+            if entry.name.startswith(".") or entry.name == ".gitkeep":
+                continue
+            if entry.is_file():
+                ext = os.path.splitext(entry.name)[1].lower()
+                doc_type = "pdf" if ext == ".pdf" else "markdown" if ext == ".md" else "image" if ext in [".png", ".jpg", ".jpeg"] else "text"
+                stat = entry.stat()
+                docs.append({
+                    "name": entry.name,
+                    "category": cat_key,
+                    "category_label": cat_info["label"],
+                    "path": entry.path,
+                    "size_bytes": stat.st_size,
+                    "size_kb": round(stat.st_size / 1024, 1),
+                    "modified_at": datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
+                    "extension": ext,
+                    "type": doc_type
+                })
+    docs.sort(key=lambda d: d["modified_at"], reverse=True)
+    return docs
+
+@app.get("/api/documents/view/{category}/{filename}")
+def view_document_file(category: str, filename: str):
+    cat_info = DOC_CATEGORIES.get(category)
+    if not cat_info:
+        raise HTTPException(status_code=400, detail="Ungültige Kategorie")
+    
+    clean_filename = os.path.basename(filename)
+    file_path = os.path.join(cat_info["dir"], clean_filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Datei nicht gefunden")
+    
+    ext = os.path.splitext(clean_filename)[1].lower()
+    media_types = {
+        ".pdf": "application/pdf",
+        ".md": "text/markdown; charset=utf-8",
+        ".txt": "text/plain; charset=utf-8",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg"
+    }
+    return FileResponse(file_path, media_type=media_types.get(ext, "application/octet-stream"))
+
+class ExtractDocRequest(BaseModel):
+    category: str
+    filename: str
+
+@app.post("/api/documents/extract")
+def extract_document_text(req: ExtractDocRequest):
+    cat_info = DOC_CATEGORIES.get(req.category)
+    if not cat_info:
+        raise HTTPException(status_code=400, detail="Ungültige Kategorie")
+    
+    clean_filename = os.path.basename(req.filename)
+    file_path = os.path.join(cat_info["dir"], clean_filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Datei nicht gefunden")
+    
+    ext = os.path.splitext(clean_filename)[1].lower()
+    text = ""
+    
+    if ext in [".md", ".txt"]:
+        try:
+            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                text = f.read()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Lesefehler: {str(e)}")
+    elif ext == ".pdf":
+        try:
+            res = subprocess.run(["pdftotext", "-layout", file_path, "-"], capture_output=True, text=True, timeout=10)
+            if res.returncode == 0:
+                text = res.stdout
+            else:
+                text = f"PDF-Extraktion fehlgeschlagen: {res.stderr}"
+        except Exception as e:
+            text = f"pdftotext Ausführungsfehler: {str(e)}"
+    else:
+        text = f"Keine Textextraktion für Format {ext} unterstützt."
+    
+    company = ""
+    position = ""
+    email = ""
+    
+    emails = re.findall(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', text)
+    if emails:
+        email = emails[0]
+    
+    for line in text.splitlines():
+        line_clean = line.strip()
+        if not company and any(k in line_clean.lower() for k in ["gmbh", "ag", "consulting", "solutions", "firma:", "arbeitgeber:"]):
+            company = line_clean.replace("Firma:", "").replace("Arbeitgeber:", "").strip()
+        if not position and any(k in line_clean.lower() for k in ["position:", "beruf:", "tätigkeit:", "developer", "entwickler", "architekt"]):
+            position = line_clean.replace("Position:", "").replace("Beruf:", "").strip()
+    
+    return {
+        "filename": clean_filename,
+        "category": req.category,
+        "text": text,
+        "suggested_company": company,
+        "suggested_position": position,
+        "suggested_email": email
     }
 
 @app.get("/api/protocols")

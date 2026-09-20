@@ -491,7 +491,7 @@ def launch_app(port: int = 8765, open_browser: bool = False):
     print(f"   URL: {app_url}")
     print(f"   AlVG Compliance Standard: AKTIV")
     if open_browser:
-        subprocess.Popen(["google-chrome", app_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.Popen(["google-chrome", f"--app={app_url}", "--class=nexus-ams", "--name=nexus-ams"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     uvicorn.run("app:app", host="127.0.0.1", port=port, reload=False)
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=NEXUS // eAMS Terminal
+GenericName=eAMS Automatisierungs-Suite
+Comment=AMS Österreich Kontrollzentrum, KI-Bewerbungen & Fristenwächter für Roland Sauer (PSTNR: 4368522)
+Exec=/home/roland/Documents/ams/nexus-ams-launcher.sh
+Icon=/home/roland/Documents/ams/static/icon.png
+Terminal=false
+Categories=Office;Utility;
+StartupWMClass=nexus-ams
+Keywords=AMS;eAMS;Bewerbung;Arbeitsmarktservice;Job;Roland;NEXUS;
+MimeType=x-scheme-handler/nexus-ams;

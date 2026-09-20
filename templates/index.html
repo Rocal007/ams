@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXUS // eAMS ÖSTERREICH TERMINAL V241.0</title>
+    <!-- PWA & Mobile Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#070a13">
+    <link rel="icon" type="image/png" href="/static/icon.png">
+    <link rel="apple-touch-icon" href="/static/icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="eAMS Terminal">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -67,13 +75,11 @@
     <header class="border-b border-cyan-500/20 glass-panel sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-400/40 flex items-center justify-center glow-cyan">
-                    <i data-lucide="shield-alert" class="w-6 h-6 text-cyan-400"></i>
-                </div>
+                <img src="/static/icon.png" alt="eAMS Icon" class="w-10 h-10 rounded-lg border border-cyan-400/40 glow-cyan object-cover">
                 <div>
                     <div class="flex items-center space-x-2">
                         <span class="font-mono text-xs uppercase tracking-widest text-cyan-400 font-bold">NEXUS // SOVEREIGN HUB</span>
-                        <span class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-1.5 py-0.2 rounded font-mono">V241.0 AlVG</span>
+                        <span class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-1.5 py-0.2 rounded font-mono">STANDALONE APP</span>
                     </div>
                     <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                         eAMS KONTROLL-TERMINAL 
@@ -127,22 +133,26 @@
     <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
         <!-- Navigation Tabs -->
-        <div class="flex border-b border-slate-800 space-x-1 font-mono text-xs">
-            <button onclick="switchTab('tab-radar')" id="btn-tab-radar" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 bg-slate-900/60">
+        <div class="flex border-b border-slate-800 space-x-1 font-mono text-xs overflow-x-auto">
+            <button onclick="switchTab('tab-radar')" id="btn-tab-radar" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 bg-slate-900/60 whitespace-nowrap">
                 <i data-lucide="radar" class="w-4 h-4"></i>
-                <span>1. Fristen- & Aufgaben-Radar (<span id="count-open-tasks">0</span>)</span>
+                <span>1. Fristen-Radar (<span id="count-open-tasks">0</span>)</span>
             </button>
-            <button onclick="switchTab('tab-apply')" id="btn-tab-apply" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            <button onclick="switchTab('tab-apply')" id="btn-tab-apply" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">
                 <i data-lucide="sparkles" class="w-4 h-4"></i>
-                <span>2. KI-Bewerbungs-Studio (Visium F)</span>
+                <span>2. KI-Bewerbungs-Studio</span>
             </button>
-            <button onclick="switchTab('tab-protocols')" id="btn-tab-protocols" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            <button onclick="switchTab('tab-vault')" id="btn-tab-vault" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">
+                <i data-lucide="folder-archive" class="w-4 h-4"></i>
+                <span>3. Dokumenten-Tresor (<span id="count-documents">0</span>)</span>
+            </button>
+            <button onclick="switchTab('tab-protocols')" id="btn-tab-protocols" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">
                 <i data-lucide="file-check" class="w-4 h-4"></i>
-                <span>3. Die Protokolle & Audit-Matrix (<span id="count-actions">0</span>)</span>
+                <span>4. Protokoll-Matrix (<span id="count-actions">0</span>)</span>
             </button>
-            <button onclick="switchTab('tab-telemetry')" id="btn-tab-telemetry" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            <button onclick="switchTab('tab-telemetry')" id="btn-tab-telemetry" class="tab-btn px-4 py-2.5 rounded-t-lg font-bold flex items-center gap-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap">
                 <i data-lucide="activity" class="w-4 h-4"></i>
-                <span>4. Bunker-Telemetrie</span>
+                <span>5. Bunker-Telemetrie</span>
             </button>
         </div>
 
@@ -258,7 +268,50 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- TAB 3: DIE PROTOKOLLE & AUDIT-MATRIX                          -->
+        <!-- TAB 3: DOKUMENTEN- & VORSCHLAGS-TRESOR                         -->
+        <!-- ============================================================== -->
+        <div id="tab-vault" class="tab-content hidden space-y-4">
+            <div class="glass-panel rounded-xl p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs uppercase tracking-wider text-cyan-400 font-bold">DOKUMENTEN-ARCHIV</span>
+                            <span class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700/50 px-1.5 py-0.5 rounded font-mono">Befunde & Nachweise</span>
+                        </div>
+                        <h2 class="text-sm font-bold text-white mt-0.5">Vermittlungsvorschläge, Bewerbungen & eAMS-Bescheide</h2>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="loadDocuments()" class="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                            <span>Aktualisieren</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Filter Pills & Search -->
+                <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+                    <div class="flex flex-wrap items-center gap-1.5" id="vault-filter-pills">
+                        <button onclick="filterDocuments('all')" class="doc-filter-btn px-3 py-1 rounded-full bg-cyan-600 text-white font-bold transition" data-cat="all">Alle (<span id="count-all-docs">0</span>)</button>
+                        <button onclick="filterDocuments('vermittlungsvorschlaege')" class="doc-filter-btn px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white transition" data-cat="vermittlungsvorschlaege">Vermittlungsvorschläge (<span id="count-vorschlaege">0</span>)</button>
+                        <button onclick="filterDocuments('bewerbungen')" class="doc-filter-btn px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white transition" data-cat="bewerbungen">Bewerbungen (<span id="count-bewerbungen">0</span>)</button>
+                        <button onclick="filterDocuments('bescheide')" class="doc-filter-btn px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white transition" data-cat="bescheide">Bescheide (<span id="count-bescheide">0</span>)</button>
+                        <button onclick="filterDocuments('postfach')" class="doc-filter-btn px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white transition" data-cat="postfach">Postfach (<span id="count-postfach">0</span>)</button>
+                    </div>
+                    <div class="w-full sm:w-64">
+                        <input type="text" id="vault-search" oninput="searchDocuments()" placeholder="Dokument suchen..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Documents Grid -->
+                <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+                    <div class="col-span-full text-slate-500 text-xs py-8 text-center font-mono">Lade Dokumente aus Tresor...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: DIE PROTOKOLLE & AUDIT-MATRIX                          -->
         <!-- ============================================================== -->
         <div id="tab-protocols" class="tab-content hidden space-y-4">
             <div class="glass-panel rounded-xl p-5 space-y-4">
@@ -436,6 +489,45 @@
         </div>
     </div>
 
+    <!-- Document Preview Modal -->
+    <div id="modal-doc-preview" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-cyan-800/80 rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <div id="modal-doc-icon" class="w-8 h-8 rounded bg-cyan-950/80 border border-cyan-700/60 flex items-center justify-center text-cyan-400">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-doc-title" class="font-bold text-white text-sm font-mono truncate max-w-lg">Dokumenten-Vorschau</h3>
+                        <span id="modal-doc-meta" class="text-[11px] text-slate-400 font-mono"></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a id="modal-doc-open-link" href="#" target="_blank" class="px-2.5 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-cyan-300 font-mono flex items-center gap-1.5 transition">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                        <span>Vollbild</span>
+                    </a>
+                    <button onclick="closeDocPreviewModal()" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="modal-doc-body" class="flex-1 overflow-auto rounded-lg bg-slate-950 p-4 font-mono text-xs text-slate-300 min-h-[350px]">
+                <!-- Dynamic Content (iframe, pre, img) -->
+            </div>
+            <div class="flex flex-wrap justify-between items-center pt-3 border-t border-slate-800 gap-2">
+                <div class="text-[11px] text-slate-500 font-mono">NEXUS Dokumenten-Tresor • Lückenlose Revisionssicherheit</div>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeDocPreviewModal()" class="px-3 py-1.5 rounded bg-slate-800 text-slate-300 text-xs font-mono">Schließen</button>
+                    <button onclick="loadDocIntoApplyFromModal()" id="btn-modal-load-apply" class="px-3.5 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-900/40 transition">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>In KI-Bewerbungs-Studio laden</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Frontend Logic Script -->
     <script>
         lucide.createIcons();
@@ -454,6 +546,7 @@
                 activeBtn.classList.remove('border-transparent', 'text-slate-400');
             }
             if (tabId === 'tab-protocols') loadProtocols();
+            if (tabId === 'tab-vault') loadDocuments();
         }
 
         function toggleProtocolView(view) {
@@ -712,9 +805,217 @@
             await refreshStatus();
         }
 
+        // -------------------------------------------------------------
+        // Document Vault & File Preview Logic
+        // -------------------------------------------------------------
+        let allVaultDocs = [];
+        let activeVaultCategory = 'all';
+        let currentPreviewDoc = null;
+
+        async function loadDocuments() {
+            try {
+                const res = await fetch('/api/documents/list');
+                allVaultDocs = await res.json();
+
+                // Update Counter Badges
+                document.getElementById('count-documents').textContent = allVaultDocs.length;
+                document.getElementById('count-all-docs').textContent = allVaultDocs.length;
+
+                const counts = {
+                    vermittlungsvorschlaege: 0,
+                    bewerbungen: 0,
+                    bescheide: 0,
+                    postfach: 0
+                };
+                allVaultDocs.forEach(d => {
+                    if (counts[d.category] !== undefined) counts[d.category]++;
+                });
+
+                document.getElementById('count-vorschlaege').textContent = counts.vermittlungsvorschlaege;
+                document.getElementById('count-bewerbungen').textContent = counts.bewerbungen;
+                document.getElementById('count-bescheide').textContent = counts.bescheide;
+                document.getElementById('count-postfach').textContent = counts.postfach;
+
+                renderDocuments();
+            } catch (err) {
+                console.error("Documents load error", err);
+            }
+        }
+
+        function filterDocuments(cat) {
+            activeVaultCategory = cat;
+            document.querySelectorAll('.doc-filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.className = 'doc-filter-btn px-3 py-1 rounded-full bg-cyan-600 text-white font-bold transition';
+                } else {
+                    btn.className = 'doc-filter-btn px-3 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white transition';
+                }
+            });
+            renderDocuments();
+        }
+
+        function searchDocuments() {
+            renderDocuments();
+        }
+
+        function renderDocuments() {
+            const query = (document.getElementById('vault-search').value || '').toLowerCase().trim();
+            const grid = document.getElementById('documents-grid');
+            grid.innerHTML = '';
+
+            let filtered = allVaultDocs;
+            if (activeVaultCategory !== 'all') {
+                filtered = filtered.filter(d => d.category === activeVaultCategory);
+            }
+            if (query) {
+                filtered = filtered.filter(d => d.name.toLowerCase().includes(query) || d.category_label.toLowerCase().includes(query));
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-slate-500 text-xs py-8 text-center font-mono">Keine Dokumente in dieser Kategorie gefunden.</div>';
+                return;
+            }
+
+            filtered.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = 'p-3.5 rounded-xl border border-slate-800/80 bg-slate-900/70 hover:border-cyan-700/60 transition flex flex-col justify-between space-y-3';
+                
+                // Type styling
+                let typeBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300">DOC</span>';
+                let iconName = 'file-text';
+                let iconColor = 'text-cyan-400';
+
+                if (doc.type === 'pdf') {
+                    typeBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-rose-950 text-rose-300 border border-rose-800/60">PDF</span>';
+                    iconName = 'file';
+                    iconColor = 'text-rose-400';
+                } else if (doc.type === 'markdown') {
+                    typeBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-800/60">MD</span>';
+                    iconName = 'file-code';
+                    iconColor = 'text-cyan-400';
+                } else if (doc.type === 'image') {
+                    typeBadge = '<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-950 text-purple-300 border border-purple-800/60">IMG</span>';
+                    iconName = 'image';
+                    iconColor = 'text-purple-400';
+                }
+
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            ${typeBadge}
+                            <span class="text-[10px] font-mono text-slate-500 truncate">${doc.category_label}</span>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <i data-lucide="${iconName}" class="w-5 h-5 ${iconColor} mt-0.5 shrink-0"></i>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-xs text-white truncate font-mono" title="${doc.name}">${doc.name}</h4>
+                                <div class="text-[10px] font-mono text-slate-400 mt-0.5 flex items-center gap-2">
+                                    <span>${doc.size_kb} KB</span>
+                                    <span>•</span>
+                                    <span>${doc.modified_at}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800 flex items-center justify-between gap-2 text-xs font-mono">
+                        <button onclick='previewDocument(${JSON.stringify(doc)})' class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            <span>Vorschau</span>
+                        </button>
+                        ${(doc.category === 'vermittlungsvorschlaege' || doc.category === 'bewerbungen' || doc.type === 'pdf' || doc.type === 'markdown') ? `
+                        <button onclick='loadDocIntoApplyDirectly(${JSON.stringify(doc)})' class="px-2.5 py-1 rounded bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800/60 transition flex items-center gap-1">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            <span>In Studio</span>
+                        </button>` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        async function previewDocument(doc) {
+            currentPreviewDoc = doc;
+            document.getElementById('modal-doc-title').textContent = doc.name;
+            document.getElementById('modal-doc-meta').textContent = `${doc.category_label} • ${doc.size_kb} KB • Stand: ${doc.modified_at}`;
+            const fileUrl = `/api/documents/view/${doc.category}/${doc.name}`;
+            document.getElementById('modal-doc-open-link').href = fileUrl;
+
+            const body = document.getElementById('modal-doc-body');
+            body.innerHTML = '<div class="text-center py-10 text-cyan-300 font-mono animate-pulse">Lade Vorschau...</div>';
+            document.getElementById('modal-doc-preview').classList.remove('hidden');
+
+            if (doc.type === 'pdf') {
+                body.innerHTML = `<iframe src="${fileUrl}" class="w-full h-[65vh] rounded border border-slate-800"></iframe>`;
+            } else if (doc.type === 'image') {
+                body.innerHTML = `<div class="flex items-center justify-center p-4"><img src="${fileUrl}" class="max-h-[65vh] max-w-full rounded shadow-lg border border-slate-800"></div>`;
+            } else {
+                try {
+                    const res = await fetch('/api/documents/extract', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ category: doc.category, filename: doc.name })
+                    });
+                    const data = await res.json();
+                    body.innerHTML = `<pre class="whitespace-pre-wrap font-sans text-xs leading-relaxed text-slate-200">${data.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
+                } catch (e) {
+                    body.innerHTML = `<div class="text-rose-400">Fehler beim Laden des Inhalts: ${e}</div>`;
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function closeDocPreviewModal() {
+            document.getElementById('modal-doc-preview').classList.add('hidden');
+            document.getElementById('modal-doc-body').innerHTML = '';
+            currentPreviewDoc = null;
+        }
+
+        async function loadDocIntoApplyDirectly(doc) {
+            try {
+                const res = await fetch('/api/documents/extract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category: doc.category, filename: doc.name })
+                });
+                const data = await res.json();
+
+                if (data.suggested_company) document.getElementById('apply-company').value = data.suggested_company;
+                if (data.suggested_position) document.getElementById('apply-position').value = data.suggested_position;
+                if (data.suggested_email) document.getElementById('apply-email').value = data.suggested_email;
+                if (data.text) document.getElementById('apply-job-text').value = data.text;
+
+                switchTab('tab-apply');
+                alert(`Dokument "${doc.name}" erfolgreich ins KI-Bewerbungs-Studio geladen!`);
+            } catch (err) {
+                alert("Fehler beim Extrahieren des Dokuments: " + err);
+            }
+        }
+
+        function loadDocIntoApplyFromModal() {
+            if (currentPreviewDoc) {
+                const doc = currentPreviewDoc;
+                closeDocPreviewModal();
+                loadDocIntoApplyDirectly(doc);
+            }
+        }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('NEXUS Service Worker registered with scope:', reg.scope);
+                }).catch(err => {
+                    console.log('NEXUS Service Worker registration failed:', err);
+                });
+            });
+        }
+
         // Init on page load
         refreshStatus();
         loadTasks();
+        loadDocuments();
         setInterval(refreshStatus, 10000);
     </script>
 </body>
